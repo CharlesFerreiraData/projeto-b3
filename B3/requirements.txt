@@ -1,0 +1,6 @@
+yfinance
+pandas
+pyspark
+lxml
+pyarrow
+fastparquet

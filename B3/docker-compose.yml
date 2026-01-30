@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  b3_engine:
+    build: .
+    container_name: b3_container
+    volumes:
+      - .:/app
+    tty: true
+    stdin_open: true
+    restart: always
