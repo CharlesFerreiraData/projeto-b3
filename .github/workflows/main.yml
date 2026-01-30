@@ -2,8 +2,8 @@ name: Pipeline Diario B3
 
 on:
   schedule:
-    - cron: '0 21 * * 1-5' # Roda às 21h (horário de Brasília) de segunda a sexta
-  workflow_dispatch: # Permite que você rode manualmente clicando num botão
+    - cron: '0 21 * * 1-5' # Roda às 21h (Brasília) de segunda a sexta
+  workflow_dispatch: # Permite rodar manualmente para testar
 
 jobs:
   build:
@@ -17,19 +17,24 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Instalar Java (Obrigatório para PySpark)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y default-jre
+
       - name: Instalar dependências
-        run: pip install -r requirements.txt
+        run: pip install -r B3/requirements.txt
 
       - name: Executar Ingestão (Bronze)
-        run: python scripts/ingestion.py
+        run: python B3/scripts/ingestion.py
 
       - name: Executar Transformação (Silver/Gold)
-        run: python scripts/transform.py
+        run: python B3/scripts/transform.py
 
       - name: Salvar resultados no GitHub
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          git add data/
+          git add B3/data/
           git commit -m "Dados atualizados via automação" || exit 0
           git push
