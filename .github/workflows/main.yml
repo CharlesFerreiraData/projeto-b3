@@ -1,0 +1,35 @@
+name: Pipeline Diario B3
+
+on:
+  schedule:
+    - cron: '0 21 * * 1-5' # Roda às 21h (horário de Brasília) de segunda a sexta
+  workflow_dispatch: # Permite que você rode manualmente clicando num botão
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código do repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Executar Ingestão (Bronze)
+        run: python scripts/ingestion.py
+
+      - name: Executar Transformação (Silver/Gold)
+        run: python scripts/transform.py
+
+      - name: Salvar resultados no GitHub
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add data/
+          git commit -m "Dados atualizados via automação" || exit 0
+          git push
